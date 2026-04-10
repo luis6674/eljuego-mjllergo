@@ -78,6 +78,7 @@ const scoreLabelEl      = document.getElementById('score-label');
 const audioErrorEl      = document.getElementById('audio-error');
 const musicPlayerEl     = document.getElementById('music-player');
 const playerTracksEl    = document.getElementById('player-tracks');
+const hintOverlayEl     = document.getElementById('hint-overlay');
 
 // ─────────────────────────────────────────────
 // INIT
@@ -151,7 +152,26 @@ function startGame() {
   setTimeout(() => {
     introScreenEl.classList.add('hidden');
     gameScreenEl.classList.remove('hidden');
+    showHint();
   }, 700);
+}
+
+// ─────────────────────────────────────────────
+// INSTRUCTION HINT
+// ─────────────────────────────────────────────
+function showHint() {
+  hintOverlayEl.classList.remove('hidden');
+
+  const dismiss = () => {
+    hintOverlayEl.classList.add('dismissed');
+    setTimeout(() => hintOverlayEl.classList.add('hidden'), 400);
+  };
+
+  document.getElementById('hint-ok').addEventListener('click', dismiss, { once: true });
+  // Also dismiss if the player just starts interacting with an organ
+  document.addEventListener('pointerdown', dismiss, { once: true });
+  // Auto-dismiss after 8 seconds so it never blocks play
+  setTimeout(dismiss, 8000);
 }
 
 // ─────────────────────────────────────────────
