@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Juego — MJ Llergo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       TWEEZERS CURSOR
+       ══════════════════════════════════════ -->
+  <div id="tweezers-cursor" aria-hidden="true">
+    <img id="tweezers-img" src="images/tweezers-open-bk.png" alt="" draggable="false">
+  </div>
+
+  <!-- ══════════════════════════════════════
+       INTRO SCREEN
+       ══════════════════════════════════════ -->
+  <div id="intro-screen">
+    <div class="intro-inner">
+      <img class="intro-logo" src="images/popup-cover.jpg" alt="El Juego">
+      <button id="start-btn">COMENZAR LA OPERACIÓN</button>
+      <p class="intro-hint">Mantén la pinza firme · Extrae con precisión</p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       GAME SCREEN
+       ══════════════════════════════════════ -->
+  <div id="game-screen" class="hidden">
+
+    <!-- Board -->
+    <div id="board-wrapper">
+      <div id="board-container">
+        <img id="board-img" src="images/board-base.jpg" alt="MJ Llergo" draggable="false">
+
+        <!-- Organ: Heart -->
+        <div class="organ-slot" id="slot-heart" data-organ="heart">
+          <img class="piece-img" src="images/piece-heart.png" alt="Corazón" draggable="false">
+          <svg class="progress-ring" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring-bg" cx="30" cy="30" r="24"/>
+            <circle class="ring-fill" id="ring-heart" cx="30" cy="30" r="24"
+              transform="rotate(-90 30 30)"/>
+          </svg>
+        </div>
+
+        <!-- Organ: Butterfly -->
+        <div class="organ-slot" id="slot-butterfly" data-organ="butterfly">
+          <img class="piece-img" src="images/piece-butterfly.png" alt="Mariposa" draggable="false">
+          <svg class="progress-ring" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring-bg" cx="30" cy="30" r="24"/>
+            <circle class="ring-fill" id="ring-butterfly" cx="30" cy="30" r="24"
+              transform="rotate(-90 30 30)"/>
+          </svg>
+        </div>
+
+        <!-- Organ: Rib -->
+        <div class="organ-slot" id="slot-rib" data-organ="rib">
+          <img class="piece-img" src="images/piece-rib.png" alt="Costilla" draggable="false">
+          <svg class="progress-ring" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring-bg" cx="30" cy="30" r="24"/>
+            <circle class="ring-fill" id="ring-rib" cx="30" cy="30" r="24"
+              transform="rotate(-90 30 30)"/>
+          </svg>
+        </div>
+
+        <!-- Organ: Armbone -->
+        <div class="organ-slot" id="slot-armbone" data-organ="armbone">
+          <img class="piece-img" src="images/piece-armbone.png" alt="Hueso" draggable="false">
+          <svg class="progress-ring" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+            <circle class="ring-bg" cx="30" cy="30" r="24"/>
+            <circle class="ring-fill" id="ring-armbone" cx="30" cy="30" r="24"
+              transform="rotate(-90 30 30)"/>
+          </svg>
+        </div>
+
+      </div><!-- /board-container -->
+    </div><!-- /board-wrapper -->
+
+    <!-- Side Panel -->
+    <aside id="side-panel">
+      <div class="panel-logo-wrap">
+        <img src="images/popup-cover.jpg" alt="El Juego" class="panel-logo">
+      </div>
+      <p class="panel-subtitle">Sala de Operaciones</p>
+
+      <div id="tray">
+
+        <div class="organ-box" id="box-heart">
+          <div class="box-slot">
+            <img class="box-piece" src="images/piece-heart.png" alt="Corazón" draggable="false">
+          </div>
+          <div class="box-meta">
+            <span class="box-label">Corazón</span>
+            <span class="music-dot" id="dot-heart"></span>
+          </div>
+        </div>
+
+        <div class="organ-box" id="box-butterfly">
+          <div class="box-slot">
+            <img class="box-piece" src="images/piece-butterfly.png" alt="Mariposa" draggable="false">
+          </div>
+          <div class="box-meta">
+            <span class="box-label">Mariposa</span>
+            <span class="music-dot" id="dot-butterfly"></span>
+          </div>
+        </div>
+
+        <div class="organ-box" id="box-rib">
+          <div class="box-slot">
+            <img class="box-piece" src="images/piece-rib.png" alt="Costilla" draggable="false">
+          </div>
+          <div class="box-meta">
+            <span class="box-label">Costilla</span>
+            <span class="music-dot" id="dot-rib"></span>
+          </div>
+        </div>
+
+        <div class="organ-box" id="box-armbone">
+          <div class="box-slot">
+            <img class="box-piece" src="images/piece-armbone.png" alt="Hueso" draggable="false">
+          </div>
+          <div class="box-meta">
+            <span class="box-label">Hueso</span>
+            <span class="music-dot" id="dot-armbone"></span>
+          </div>
+        </div>
+
+      </div><!-- /tray -->
+
+      <div id="score-area">
+        <span id="score-label">0 / 4</span>
+      </div>
+    </aside>
+
+  </div><!-- /game-screen -->
+
+  <!-- ══════════════════════════════════════
+       VICTORY SCREEN
+       ══════════════════════════════════════ -->
+  <div id="victory-screen" class="hidden">
+    <div class="victory-inner">
+      <img src="images/popup-cover.jpg" alt="El Juego" class="victory-logo">
+      <h2 class="victory-title">Operación Completada</h2>
+      <p class="victory-sub">Todos los órganos han sido extraídos con éxito</p>
+      <button id="replay-btn">VOLVER A OPERAR</button>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="audio-error"    src="music/error-buzz.mp3"    preload="auto"></audio>
+  <audio id="audio-heart"    src="music/song-heart.mp3"    preload="auto" loop></audio>
+  <audio id="audio-butterfly" src="music/song-butterfly.mp3" preload="auto" loop></audio>
+  <audio id="audio-rib"      src="music/song-rib.mp3"      preload="auto" loop></audio>
+  <audio id="audio-armbone"  src="music/song-armbone.mp3"  preload="auto" loop></audio>
+
+  <script src="game.js"></script>
+</body>
+</html>
