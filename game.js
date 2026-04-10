@@ -70,6 +70,8 @@ const startBtnEl        = document.getElementById('start-btn');
 const replayBtnEl       = document.getElementById('replay-btn');
 const scoreLabelEl      = document.getElementById('score-label');
 const audioErrorEl      = document.getElementById('audio-error');
+const musicPlayerEl     = document.getElementById('music-player');
+const playerTracksEl    = document.getElementById('player-tracks');
 
 // ─────────────────────────────────────────────
 // INIT
@@ -330,6 +332,7 @@ function fillBox(organId, box) {
   if (audio) {
     audio.volume = 0.72;
     audio.play().catch(() => {});
+    addTrackToPlayer(organId, audio);
   }
 
   // Update score
@@ -340,6 +343,50 @@ function fillBox(organId, box) {
   if (extractedCount >= ORGANS.length) {
     setTimeout(showVictory, 900);
   }
+}
+
+// ─────────────────────────────────────────────
+// MUSIC PLAYER PANEL
+// ─────────────────────────────────────────────
+function addTrackToPlayer(organId, audio) {
+  const organ = ORGANS.find(o => o.id === organId);
+
+  // Slide the panel up on the first track
+  musicPlayerEl.classList.add('visible');
+
+  // Build the track row
+  const track = document.createElement('div');
+  track.className = 'player-track';
+  track.id = `track-${organId}`;
+
+  const dot = document.createElement('span');
+  dot.className = 'track-pulse';
+
+  const title = document.createElement('span');
+  title.className = 'track-title';
+  title.textContent = organ ? organ.label : organId;
+
+  const btn = document.createElement('button');
+  btn.className = 'track-btn';
+  btn.innerHTML = '⏸';
+  btn.setAttribute('aria-label', 'Pausar');
+
+  btn.addEventListener('click', () => {
+    if (audio.paused) {
+      audio.play().catch(() => {});
+      btn.innerHTML = '⏸';
+      btn.setAttribute('aria-label', 'Pausar');
+      track.classList.remove('paused');
+    } else {
+      audio.pause();
+      btn.innerHTML = '▶';
+      btn.setAttribute('aria-label', 'Reproducir');
+      track.classList.add('paused');
+    }
+  });
+
+  track.append(dot, title, btn);
+  playerTracksEl.appendChild(track);
 }
 
 // ─────────────────────────────────────────────
