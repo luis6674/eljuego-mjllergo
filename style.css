@@ -449,3 +449,107 @@ html, body {
   from { opacity: 0; transform: translateY(40px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* ══════════════════════════════════════════
+   MUSIC PLAYER PANEL
+   ══════════════════════════════════════════ */
+
+#music-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 210px; /* clears the 210px side panel */
+  background: rgba(14, 6, 6, 0.93);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(192, 57, 43, 0.38);
+  z-index: 300;
+  transform: translateY(110%);
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#music-player.visible {
+  transform: translateY(0);
+}
+
+#player-header {
+  padding: 8px 20px 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#player-heading {
+  font-family: var(--font-ui);
+  font-size: 0.58rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.player-track {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  animation: slide-up 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.player-track:last-child {
+  border-bottom: none;
+}
+
+/* Animated dot while playing */
+.track-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--red);
+  flex-shrink: 0;
+  animation: blink 1.4s ease-in-out infinite;
+  transition: background 0.3s;
+}
+
+.player-track.paused .track-pulse {
+  animation: none;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Song title */
+.track-title {
+  flex: 1;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.82);
+  transition: color 0.3s;
+}
+
+.player-track.paused .track-title {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Play / Pause button */
+.track-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(192, 57, 43, 0.5);
+  background: rgba(192, 57, 43, 0.1);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: none;
+  padding: 0;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+  line-height: 1;
+}
+
+.track-btn:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
