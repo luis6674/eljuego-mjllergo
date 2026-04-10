@@ -466,7 +466,7 @@ html, body {
   -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid rgba(192, 57, 43, 0.38);
   z-index: 300;
-  transform: translateY(110%);
+  transform: translateY(calc(100% + 80px));
   transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -557,6 +557,91 @@ html, body {
 }
 
 /* ══════════════════════════════════════════
+   INSTRUCTION HINT OVERLAY
+   ══════════════════════════════════════════ */
+
+#hint-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 3, 3, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 400;
+  animation: fade-in 0.5s ease;
+  transition: opacity 0.4s ease;
+  cursor: none;
+}
+
+#hint-overlay.dismissed {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hint-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+  padding: 40px 32px;
+  max-width: 380px;
+}
+
+.hint-tweezers {
+  width: 36px;
+  opacity: 0.9;
+}
+
+.hint-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 2px;
+  color: #fff;
+}
+
+.hint-text {
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.hint-text strong {
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+#hint-ok {
+  margin-top: 8px;
+  padding: 13px 44px;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: #fff;
+  background: var(--red);
+  border: none;
+  cursor: none;
+  transition: opacity 0.2s;
+}
+
+#hint-ok:hover { opacity: 0.82; }
+
+/* Subtle idle pulse on organs before any extraction */
+.organ-slot:not(.extracted):not(.extracting) .piece-img {
+  animation: organ-idle 3s ease-in-out infinite;
+}
+
+@keyframes organ-idle {
+  0%, 100% { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18)); }
+  50%       { filter: drop-shadow(0 0 10px rgba(192,57,43,0.45)) brightness(1.06); }
+}
+
+/* ══════════════════════════════════════════
    MOBILE / TOUCH LAYOUT
    ══════════════════════════════════════════ */
 
@@ -572,11 +657,22 @@ html, body {
     min-height: 0;
   }
 
-  /* Board fills available height; width follows aspect ratio */
+  /* Board fills available width; height follows image aspect ratio.
+     This ensures the container exactly matches the displayed image so
+     that left/top % positions on organ slots are pixel-accurate. */
+  #board-wrapper {
+    align-items: flex-start;
+    overflow: hidden;
+  }
+
   #board-container {
-    height: 100%;
-    width: auto;
-    max-width: 100vw;
+    width: 100%;
+    height: auto;
+  }
+
+  #board-img {
+    width: 100%;
+    height: auto;
   }
 
   /* Side panel → compact horizontal bar at the bottom */
