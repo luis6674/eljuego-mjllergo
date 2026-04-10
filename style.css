@@ -49,9 +49,16 @@ html, body {
   width: 52px;
   pointer-events: none;
   z-index: 9999;
-  /* offset so tips align with mouse hotspot */
+  /* desktop: tips align with mouse hotspot */
   transform: translate(-50%, -8px);
-  will-change: transform, left, top;
+  will-change: left, top;
+}
+
+/* Touch mode: flip so tips point DOWN toward the organ.
+   JS sets top = touchY - imageHeight - margin,
+   scaleY(-1) then places the tips just above the finger. */
+#tweezers-cursor.touch-mode {
+  transform: translate(-50%, 0) scaleY(-1);
 }
 
 #tweezers-cursor img {
@@ -122,7 +129,7 @@ html, body {
 #game-screen {
   display: flex;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
 }
 
 /* ─── Board Wrapper ──────────────────────── */
@@ -139,7 +146,7 @@ html, body {
 
 #board-container {
   position: relative;
-  height: 100vh;
+  height: 100dvh;
   /* width is auto → follows image aspect ratio */
 }
 
@@ -631,14 +638,20 @@ html, body {
 
 #hint-ok:hover { opacity: 0.82; }
 
-/* Subtle idle pulse on organs before any extraction */
+/* Idle pulse on organs — visible invitation to interact */
 .organ-slot:not(.extracted):not(.extracting) .piece-img {
-  animation: organ-idle 3s ease-in-out infinite;
+  animation: organ-idle 2s ease-in-out infinite;
 }
 
 @keyframes organ-idle {
-  0%, 100% { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18)); }
-  50%       { filter: drop-shadow(0 0 10px rgba(192,57,43,0.45)) brightness(1.06); }
+  0%, 100% {
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.22));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(192,57,43,0.9)) brightness(1.18);
+    transform: scale(1.08);
+  }
 }
 
 /* ══════════════════════════════════════════

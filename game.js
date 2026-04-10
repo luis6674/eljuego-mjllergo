@@ -49,8 +49,11 @@ const IS_TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matche
 // Steady-hand boundary tolerance (px). Wider on touch for finger imprecision.
 const HOLD_TOLERANCE = IS_TOUCH ? 28 : 14;
 
-// On touch, display tweezers above the finger so the tip is visible.
-const TOUCH_Y_OFFSET = -88;
+// Tweezers displayed at 52 px wide; aspect ratio 1761/919 → ~99.6 px tall.
+// On touch, the image is flipped (scaleY(-1)) so tips point DOWN.
+// We position `top` so the tips sit TWEEZERS_TIP_MARGIN px above the finger.
+const TWEEZERS_HEIGHT_PX = 100;
+const TWEEZERS_TIP_MARGIN = 20;
 
 // ─────────────────────────────────────────────
 // STATE
@@ -103,7 +106,20 @@ function positionSlots() {
 // ─────────────────────────────────────────────
 function moveCursor(x, y, isTouch) {
   tweetzersCursorEl.style.left = x + 'px';
-  tweetzersCursorEl.style.top  = isTouch ? (y + TOUCH_Y_OFFSET) + 'px' : y + 'px';
+
+  if (isTouch) {
+    // Tweezers are flipped via CSS scaleY(-1) so tips point down.
+    // With scaleY(-1) around the element centre, the original top (tips)
+    // lands visually at: cssTop + TWEEZERS_HEIGHT_PX.
+    // We want that to be TWEEZERS_TIP_MARGIN px above the finger:
+    //   cssTop + TWEEZERS_HEIGHT_PX = y - TWEEZERS_TIP_MARGIN
+    //   cssTop = y - TWEEZERS_HEIGHT_PX - TWEEZERS_TIP_MARGIN
+    tweetzersCursorEl.style.top = (y - TWEEZERS_HEIGHT_PX - TWEEZERS_TIP_MARGIN) + 'px';
+    tweetzersCursorEl.classList.add('touch-mode');
+  } else {
+    tweetzersCursorEl.style.top = y + 'px';
+    tweetzersCursorEl.classList.remove('touch-mode');
+  }
 }
 
 function setTweezers(state /* 'open' | 'closed' */) {
