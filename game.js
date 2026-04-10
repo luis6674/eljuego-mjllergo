@@ -43,8 +43,14 @@ const ORGANS = [
 // How long the player must hold to extract (ms)
 const EXTRACTION_DURATION = 2500;
 
-// Pixel tolerance around the slot before triggering a buzz
-const HOLD_TOLERANCE = 14;
+// Touch devices detected at runtime
+const IS_TOUCH = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+
+// Steady-hand boundary tolerance (px). Wider on touch for finger imprecision.
+const HOLD_TOLERANCE = IS_TOUCH ? 28 : 14;
+
+// On touch, display tweezers above the finger so the tip is visible.
+const TOUCH_Y_OFFSET = -88;
 
 // ─────────────────────────────────────────────
 // STATE
@@ -94,9 +100,9 @@ function positionSlots() {
 // ─────────────────────────────────────────────
 // TWEEZERS CURSOR
 // ─────────────────────────────────────────────
-function moveCursor(x, y) {
+function moveCursor(x, y, isTouch) {
   tweetzersCursorEl.style.left = x + 'px';
-  tweetzersCursorEl.style.top  = y + 'px';
+  tweetzersCursorEl.style.top  = isTouch ? (y + TOUCH_Y_OFFSET) + 'px' : y + 'px';
 }
 
 function setTweezers(state /* 'open' | 'closed' */) {
@@ -109,8 +115,8 @@ function setTweezers(state /* 'open' | 'closed' */) {
 // EVENT BINDINGS
 // ─────────────────────────────────────────────
 function bindEvents() {
-  // Cursor tracking
-  document.addEventListener('mousemove', onMouseMove);
+  // Unified pointer tracking — handles mouse, touch, and stylus in one event.
+  document.addEventListener('pointermove', onPointerMove);
 
   // Intro → Game transition
   startBtnEl.addEventListener('click', startGame);
@@ -118,24 +124,20 @@ function bindEvents() {
   // Replay
   replayBtnEl.addEventListener('click', () => location.reload());
 
-  // Organ slots: begin hold on mousedown
+  // Organ slots: begin hold on pointerdown (works for mouse AND touch)
   ORGANS.forEach(organ => {
     const slot = document.getElementById(`slot-${organ.id}`);
     if (!slot) return;
-    slot.addEventListener('mousedown', (e) => {
-      e.preventDefault();
+    slot.addEventListener('pointerdown', (e) => {
+      e.preventDefault(); // stop browser scroll / text-select on touch
       if (slot.classList.contains('extracted')) return;
       beginHold(organ.id, slot);
     });
   });
 
-  // Cancel hold on mouseup (anywhere)
-  document.addEventListener('mouseup', () => {
-    if (hold) cancelHold(false);
-  });
-
-  // Steady-hand check on mousemove
-  document.addEventListener('mousemove', onHoldMouseMove);
+  // Cancel hold on pointer release or cancel (anywhere on the document)
+  document.addEventListener('pointerup',     () => { if (hold) cancelHold(); });
+  document.addEventListener('pointercancel', () => { if (hold) cancelHold(); });
 
   // Prevent context menu from interfering
   document.addEventListener('contextmenu', e => e.preventDefault());
@@ -155,11 +157,10 @@ function startGame() {
 // ─────────────────────────────────────────────
 // MOUSE HANDLERS
 // ─────────────────────────────────────────────
-function onMouseMove(e) {
-  moveCursor(e.clientX, e.clientY);
-}
+// Single handler for pointermove — covers mouse, touch, and stylus.
+function onPointerMove(e) {
+  moveCursor(e.clientX, e.clientY, e.pointerType === 'touch');
 
-function onHoldMouseMove(e) {
   if (!hold) return;
 
   const slot = document.getElementById(`slot-${hold.organId}`);
@@ -172,9 +173,7 @@ function onHoldMouseMove(e) {
     e.clientY < rect.top    - HOLD_TOLERANCE ||
     e.clientY > rect.bottom + HOLD_TOLERANCE;
 
-  if (outside) {
-    buzzAndCancel(slot);
-  }
+  if (outside) buzzAndCancel(slot);
 }
 
 // ─────────────────────────────────────────────

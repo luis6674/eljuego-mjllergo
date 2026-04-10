@@ -134,6 +134,7 @@ html, body {
   justify-content: center;
   position: relative;
   min-width: 0;
+  touch-action: none; /* let JS handle all touches on the board */
 }
 
 #board-container {
@@ -154,6 +155,7 @@ html, body {
   position: absolute;
   transform: translate(-50%, -50%);
   cursor: none;
+  touch-action: none;
 }
 
 /* piece image fills the slot width */
@@ -552,4 +554,90 @@ html, body {
   background: var(--red);
   border-color: var(--red);
   color: #fff;
+}
+
+/* ══════════════════════════════════════════
+   MOBILE / TOUCH LAYOUT
+   ══════════════════════════════════════════ */
+
+/* Portrait phones — stack board above a compact organ bar */
+@media (max-width: 600px) {
+
+  #game-screen {
+    flex-direction: column;
+  }
+
+  #board-wrapper {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  /* Board fills available height; width follows aspect ratio */
+  #board-container {
+    height: 100%;
+    width: auto;
+    max-width: 100vw;
+  }
+
+  /* Side panel → compact horizontal bar at the bottom */
+  #side-panel {
+    flex: 0 0 64px;
+    width: 100%;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 10px;
+    gap: 8px;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .panel-logo-wrap,
+  .panel-subtitle,
+  #score-area { display: none; }
+
+  #tray {
+    flex-direction: row;
+    width: 100%;
+    gap: 6px;
+  }
+
+  .organ-box {
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    gap: 3px;
+    min-height: 0;
+  }
+
+  .box-slot {
+    width: 28px;
+    height: 28px;
+  }
+
+  .box-piece {
+    max-width: 26px;
+    max-height: 26px;
+  }
+
+  /* Hide text labels — only show icons on mobile */
+  .box-meta { display: none; }
+
+  /* Music player sits above the bottom bar */
+  #music-player {
+    right: 0;
+    bottom: 64px;
+  }
+
+  /* Intro: tighter spacing */
+  .intro-inner { gap: 24px; }
+  #start-btn   { padding: 14px 36px; letter-spacing: 3px; }
+  .intro-hint  { display: none; }
+
+  /* Victory: smaller text */
+  .victory-title { font-size: 1.4rem; }
+  .victory-sub   { font-size: 0.72rem; }
+  #replay-btn    { padding: 13px 36px; }
 }
