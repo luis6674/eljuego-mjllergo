@@ -1,0 +1,451 @@
+/* ══════════════════════════════════════════════
+   EL JUEGO — MJ LLERGO
+   Surgical Extraction Game
+   ══════════════════════════════════════════════ */
+
+:root {
+  --red:        #c0392b;
+  --red-dark:   #922b21;
+  --light-pink: #fce4ec;
+  --cream:      #fff8f6;
+  --border:     #f0c0c0;
+  --black:      #1a1a1a;
+  --gray:       #999;
+  --ring-circum: 150.796; /* 2π × 24 */
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-ui:      'Space Grotesk', system-ui, sans-serif;
+}
+
+/* ─── Reset ──────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--light-pink);
+  font-family: var(--font-ui);
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ══════════════════════════════════════════
+   TWEEZERS CURSOR
+   ══════════════════════════════════════════ */
+#tweezers-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 52px;
+  pointer-events: none;
+  z-index: 9999;
+  /* offset so tips align with mouse hotspot */
+  transform: translate(-50%, -8px);
+  will-change: transform, left, top;
+}
+
+#tweezers-cursor img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ══════════════════════════════════════════
+   INTRO SCREEN
+   ══════════════════════════════════════════ */
+#intro-screen {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  transition: opacity 0.7s ease;
+}
+
+#intro-screen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+.intro-logo {
+  width: min(440px, 75vw);
+  display: block;
+}
+
+#start-btn {
+  padding: 15px 56px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 5px;
+  color: #fff;
+  background: var(--black);
+  border: none;
+  cursor: none;
+  transition: background 0.2s, letter-spacing 0.2s;
+}
+
+#start-btn:hover {
+  background: var(--red);
+  letter-spacing: 6px;
+}
+
+.intro-hint {
+  font-size: 0.68rem;
+  letter-spacing: 2px;
+  color: #bbb;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════
+   GAME SCREEN — LAYOUT
+   ══════════════════════════════════════════ */
+#game-screen {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ─── Board Wrapper ──────────────────────── */
+#board-wrapper {
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-width: 0;
+}
+
+#board-container {
+  position: relative;
+  height: 100vh;
+  /* width is auto → follows image aspect ratio */
+}
+
+#board-img {
+  height: 100%;
+  width: auto;
+  display: block;
+  pointer-events: none;
+}
+
+/* ─── Organ Slots ────────────────────────── */
+.organ-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: none;
+}
+
+/* piece image fills the slot width */
+.piece-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.18));
+  transition: filter 0.15s, transform 0.1s;
+  transform-origin: center;
+}
+
+.organ-slot:hover .piece-img {
+  filter: drop-shadow(0 0 9px rgba(192,57,43,0.65)) brightness(1.08);
+  transform: scale(1.04);
+}
+
+.organ-slot.extracting .piece-img {
+  filter: drop-shadow(0 0 14px rgba(192,57,43,0.9)) brightness(1.18);
+  transform: scale(1.06);
+}
+
+.organ-slot.extracted {
+  display: none;
+}
+
+/* Buzz shake — accounts for base translate(-50%,-50%) */
+.organ-slot.buzz {
+  animation: buzz-shake 0.35s ease forwards;
+}
+
+/* ─── SVG Progress Ring ──────────────────── */
+.progress-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 140% so ring has breathing room around the piece */
+  width: 140%;
+  height: auto;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.organ-slot.extracting .progress-ring {
+  opacity: 1;
+}
+
+.ring-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 3;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 150.796;
+  stroke-dashoffset: 150.796;
+}
+
+/* ══════════════════════════════════════════
+   SIDE PANEL
+   ══════════════════════════════════════════ */
+#side-panel {
+  flex: 0 0 210px;
+  background: var(--cream);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 14px 12px;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.panel-logo-wrap {
+  padding: 2px 0 6px;
+}
+
+.panel-logo {
+  width: 100%;
+  display: block;
+  opacity: 0.88;
+}
+
+.panel-subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--gray);
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── Collection Tray ────────────────────── */
+#tray {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.organ-box {
+  flex: 1;
+  border: 1.5px dashed var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  transition: border-color 0.4s ease, background 0.4s ease;
+  min-height: 0;
+}
+
+.organ-box.filled {
+  border-color: var(--red);
+  border-style: solid;
+  background: rgba(192, 57, 43, 0.04);
+}
+
+.box-slot {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.box-piece {
+  max-width: 36px;
+  max-height: 36px;
+  object-fit: contain;
+  filter: grayscale(1) opacity(0.28);
+  transition: filter 0.5s ease;
+  display: block;
+}
+
+.organ-box.filled .box-piece {
+  filter: none;
+  animation: pop-in 0.55s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.box-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.box-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  color: var(--gray);
+  transition: color 0.4s;
+}
+
+.organ-box.filled .box-label {
+  color: var(--red);
+}
+
+.music-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #e0c8c8;
+  transition: background 0.4s;
+}
+
+.organ-box.filled .music-dot {
+  background: var(--red);
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+/* ─── Score ──────────────────────────────── */
+#score-area {
+  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+#score-label {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--gray);
+  letter-spacing: 3px;
+}
+
+/* ══════════════════════════════════════════
+   VICTORY SCREEN
+   ══════════════════════════════════════════ */
+#victory-screen {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 5, 5, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+  animation: fade-in 0.5s ease;
+}
+
+.victory-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+  animation: slide-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  padding: 0 24px;
+}
+
+.victory-logo {
+  width: min(340px, 70vw);
+  display: block;
+}
+
+.victory-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2rem;
+  letter-spacing: 4px;
+  color: #fff;
+}
+
+.victory-sub {
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  max-width: 340px;
+}
+
+#replay-btn {
+  margin-top: 8px;
+  padding: 15px 52px;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: #fff;
+  background: var(--red);
+  border: none;
+  cursor: none;
+  transition: opacity 0.2s;
+}
+
+#replay-btn:hover {
+  opacity: 0.8;
+}
+
+/* ══════════════════════════════════════════
+   ANIMATIONS
+   ══════════════════════════════════════════ */
+
+/* Organ extracted: flies into panel */
+@keyframes pop-in {
+  0%   { transform: scale(0.3); opacity: 0; }
+  65%  { transform: scale(1.18); }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* Music indicator pulse */
+@keyframes blink {
+  0%, 100% { transform: scale(1);   opacity: 1;   }
+  50%       { transform: scale(1.5); opacity: 0.55; }
+}
+
+/* Buzz on wrong move */
+@keyframes buzz-shake {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  15%  { transform: translate(calc(-50% + 5px), -50%) rotate( 4deg); }
+  30%  { transform: translate(calc(-50% - 5px), -50%) rotate(-4deg); }
+  45%  { transform: translate(calc(-50% + 4px), -50%) rotate( 3deg); }
+  60%  { transform: translate(calc(-50% - 4px), -50%) rotate(-3deg); }
+  80%  { transform: translate(calc(-50% + 2px), -50%) rotate( 1deg); }
+  100% { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+/* Victory screen enter */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
