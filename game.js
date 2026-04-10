@@ -13,30 +13,30 @@ const ORGANS = [
   {
     id: 'heart',
     label: 'Corazón',
-    left: '60.5%',   // ~x 872 / 1441
-    top:  '35.2%',   // ~y 760 / 2160
-    width: '10.0%',
+    left: '56.5%',   // ~x 872 / 1441
+    top:  '33.9%',   // ~y 760 / 2160
+    width: '7%',
   },
   {
     id: 'butterfly',
     label: 'Mariposa',
-    left: '33.8%',   // ~x 487 / 1441
-    top:  '40.0%',   // ~y 864 / 2160
-    width: '8.5%',
+    left: '54.4%',   // ~x 487 / 1441
+    top:  '45.5%',   // ~y 864 / 2160
+    width: '5%',
   },
   {
     id: 'rib',
     label: 'Costilla',
-    left: '42.7%',   // ~x 615 / 1441
-    top:  '50.2%',   // ~y 1085 / 2160
-    width: '9.2%',
+    left: '46.5%',   // ~x 615 / 1441
+    top:  '40.8%',   // ~y 1085 / 2160
+    width: '6.5%',
   },
   {
     id: 'armbone',
     label: 'Hueso',
-    left: '44.8%',   // ~x 645 / 1441
-    top:  '65.5%',   // ~y 1415 / 2160
-    width: '7.5%',
+    left: '35%',   // ~x 645 / 1441
+    top:  '43.6%',   // ~y 1415 / 2160
+    width: '5%',
   },
 ];
 
